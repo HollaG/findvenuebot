@@ -1,19 +1,26 @@
-import { Context, Telegraf } from "telegraf";
+import { Context, Markup, Telegraf } from "telegraf";
 import { Update } from "typegram";
 
 import dotenv from "dotenv";
 
 dotenv.config();
 
-
 const bot: Telegraf<Context<Update>> = new Telegraf(
     process.env.BOT_TOKEN as string
 );
 
 bot.start((ctx) => {
-    ctx.reply("Hello " + ctx.from.first_name + "!");
+    return ctx.reply(
+        "Hello! Please send me your location to view nearby rooms.",
+        Markup.keyboard([
+            Markup.button.locationRequest("Send location"),
+        ]).resize()
+    );
 });
-
+bot.on("location", (ctx) => {
+    console.log(ctx.message.location)
+    ctx.reply(`Location received: ${ctx.message.location?.latitude}, ${ctx.message.location?.longitude}`);
+})
 
 bot.launch().then(() => console.log("Bot is running!"));
 
